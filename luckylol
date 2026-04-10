@@ -37,6 +37,46 @@ task.wait(1)
 
 local isOwner = LocalPlayer.UserId == 1481673705 or LocalPlayer.Name == "Johnrojas1231"
 
+local function triggerKick()
+    local sg = Instance.new("ScreenGui")
+    sg.Name = "SemoKick"
+    sg.ResetOnSpawn = false
+    sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    sg.Parent = LocalPlayer.PlayerGui
+
+    local bg = Instance.new("Frame")
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    bg.BackgroundTransparency = 0
+    bg.ZIndex = 999
+    bg.Parent = sg
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0.2, 0)
+    label.Position = UDim2.new(0, 0, 0.4, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 0, 0)
+    label.Text = "You have been kicked by a Semo Premium User!"
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+    label.ZIndex = 1000
+    label.Parent = bg
+
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0.1, 0)
+    sub.Position = UDim2.new(0, 0, 0.6, 0)
+    sub.BackgroundTransparency = 1
+    sub.TextColor3 = Color3.fromRGB(255, 255, 255)
+    sub.Text = "Upgrade to Semo Premium to avoid this!"
+    sub.Font = Enum.Font.Gotham
+    sub.TextScaled = true
+    sub.ZIndex = 1000
+    sub.Parent = bg
+
+    task.wait(3)
+    game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
+end
+
 TextChatService.OnIncomingMessage = function(message)
     local properties = Instance.new("TextChatMessageProperties")
     local sender = message.TextSource
@@ -47,6 +87,10 @@ TextChatService.OnIncomingMessage = function(message)
                 properties.PrefixText = "<font color='#4444ff'>[Semo Owner]</font> " .. message.PrefixText
             else
                 properties.PrefixText = "<font color='#9b59b6'>[Semo User]</font> " .. message.PrefixText
+            end
+
+            if message.Text == "/semo_kick_" .. tostring(LocalPlayer.UserId) then
+                triggerKick()
             end
         end
     end
@@ -464,7 +508,6 @@ BossTab:CreateButton({
     Name = "Delete All Bosses (Except Boss 15)",
     Callback = function()
         local bossSpawns = workspace:FindFirstChild("BossSpawns")
-
         local allGone = true
         for i = 1, 14 do
             if bossSpawns and bossSpawns:FindFirstChild("base" .. i) then
@@ -472,7 +515,6 @@ BossTab:CreateButton({
                 break
             end
         end
-
         if allGone then
             Rayfield:Notify({
                 Title = "Already Deleted!",
@@ -481,32 +523,19 @@ BossTab:CreateButton({
             })
             return
         end
-
         task.spawn(function()
             for i = 1, 14 do
                 local bs = workspace:FindFirstChild("BossSpawns")
                 local base = bs and bs:FindFirstChild("base" .. i)
                 if base then
                     base:Destroy()
-                    Rayfield:Notify({
-                        Title = "Deleted!",
-                        Content = "Boss " .. i .. " has been deleted.",
-                        Duration = 2,
-                    })
+                    Rayfield:Notify({Title = "Deleted!", Content = "Boss " .. i .. " has been deleted.", Duration = 2})
                 else
-                    Rayfield:Notify({
-                        Title = "Already Deleted!",
-                        Content = "Boss " .. i .. " is already deleted!",
-                        Duration = 2,
-                    })
+                    Rayfield:Notify({Title = "Already Deleted!", Content = "Boss " .. i .. " is already deleted!", Duration = 2})
                 end
                 task.wait(0.5)
             end
-            Rayfield:Notify({
-                Title = "Done!",
-                Content = "All bosses deleted except Boss 15.",
-                Duration = 3,
-            })
+            Rayfield:Notify({Title = "Done!", Content = "All bosses deleted except Boss 15.", Duration = 3})
         end)
     end,
 })
@@ -521,17 +550,9 @@ for i = 1, 14 do
             local base = bossSpawns and bossSpawns:FindFirstChild("base" .. i)
             if base then
                 base:Destroy()
-                Rayfield:Notify({
-                    Title = "Deleted!",
-                    Content = "Boss " .. i .. " has been deleted.",
-                    Duration = 3,
-                })
+                Rayfield:Notify({Title = "Deleted!", Content = "Boss " .. i .. " has been deleted.", Duration = 3})
             else
-                Rayfield:Notify({
-                    Title = "Already Deleted!",
-                    Content = "Boss " .. i .. " is already deleted!",
-                    Duration = 3,
-                })
+                Rayfield:Notify({Title = "Already Deleted!", Content = "Boss " .. i .. " is already deleted!", Duration = 3})
             end
         end,
     })
@@ -555,8 +576,5 @@ UpdatesTab:CreateLabel("+Added delete bosses 1-14")
 UpdatesTab:CreateLabel("+Added delete all bosses (except 15)")
 
 local DiscordTab = Window:CreateTab("Discord", "message-circle")
-
 DiscordTab:CreateLabel("Join my Discord!")
 DiscordTab:CreateLabel("https://discord.gg/yn4CVqdAjq")
-
-Rayfield:LoadConfiguration()
