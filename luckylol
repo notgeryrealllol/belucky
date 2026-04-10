@@ -88,7 +88,6 @@ TextChatService.OnIncomingMessage = function(message)
             else
                 properties.PrefixText = "<font color='#9b59b6'>[Semo User]</font> " .. message.PrefixText
             end
-
             if message.Text == "/semo_kick_" .. tostring(LocalPlayer.UserId) then
                 triggerKick()
             end
@@ -516,11 +515,7 @@ BossTab:CreateButton({
             end
         end
         if allGone then
-            Rayfield:Notify({
-                Title = "Already Deleted!",
-                Content = "All bosses have been already deleted!",
-                Duration = 3,
-            })
+            Rayfield:Notify({Title = "Already Deleted!", Content = "All bosses have been already deleted!", Duration = 3})
             return
         end
         task.spawn(function()
@@ -578,3 +573,5 @@ UpdatesTab:CreateLabel("+Added delete all bosses (except 15)")
 local DiscordTab = Window:CreateTab("Discord", "message-circle")
 DiscordTab:CreateLabel("Join my Discord!")
 DiscordTab:CreateLabel("https://discord.gg/yn4CVqdAjq")
+
+Rayfield:LoadConfiguration()
