@@ -1,6 +1,9 @@
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
 
 local webhookURL = "https://discord.com/api/webhooks/1486537275599749140/YUj_FhHHmlDU7j9IYRBCeT90OlVQ-UuI6OdWS1oIEYLS7c35dc96DiJPnnBda9zc7GS1"
 
@@ -29,6 +32,134 @@ pcall(function()
     })
 end)
 
+local isOwner = LocalPlayer.UserId == 1481673705 or LocalPlayer.Name == "Johnrojas1231"
+
+local function createTag(root, isOwnerTag)
+    local tagGui = Instance.new("BillboardGui")
+    tagGui.Size = UDim2.new(0, 180, 0, 50)
+    tagGui.StudsOffset = Vector3.new(0, 4, 0)
+    tagGui.AlwaysOnTop = true
+    tagGui.Parent = root
+
+    local bg = Instance.new("Frame")
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.BackgroundColor3 = isOwnerTag and Color3.fromRGB(0, 60, 160) or Color3.fromRGB(60, 0, 100)
+    bg.BackgroundTransparency = 0.3
+    bg.BorderSizePixel = 0
+    bg.Parent = tagGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = bg
+
+    local image = Instance.new("ImageLabel")
+    image.Size = UDim2.new(0, 40, 0, 40)
+    image.Position = UDim2.new(0, 5, 0.5, -20)
+    image.BackgroundTransparency = 1
+    image.Image = "rbxassetid://137671104408806"
+    image.Parent = bg
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, -55, 0.5, 0)
+    nameLabel.Position = UDim2.new(0, 50, 0, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    nameLabel.TextStrokeTransparency = 0
+    nameLabel.Text = isOwnerTag and "Semo Owner" or "Semo User"
+    nameLabel.Font = Enum.Font.Fantasy
+    nameLabel.TextScaled = true
+    nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    nameLabel.Parent = bg
+
+    local userLabel = Instance.new("TextLabel")
+    userLabel.Size = UDim2.new(1, -55, 0.5, 0)
+    userLabel.Position = UDim2.new(0, 50, 0.5, 0)
+    userLabel.BackgroundTransparency = 1
+    userLabel.TextColor3 = isOwnerTag and Color3.fromRGB(180, 220, 255) or Color3.fromRGB(200, 180, 255)
+    userLabel.TextStrokeTransparency = 0
+    userLabel.Text = "@" .. LocalPlayer.Name
+    userLabel.Font = Enum.Font.Gotham
+    userLabel.TextScaled = true
+    userLabel.TextXAlignment = Enum.TextXAlignment.Left
+    userLabel.Parent = bg
+
+    return tagGui
+end
+
+local function applyTagToOtherPlayers(player)
+    if player.UserId == 1481673705 or player.Name == "Johnrojas1231" then
+        local char = player.Character or player.CharacterAdded:Wait()
+        local root = char:WaitForChild("HumanoidRootPart")
+
+        local tagGui = Instance.new("BillboardGui")
+        tagGui.Size = UDim2.new(0, 180, 0, 50)
+        tagGui.StudsOffset = Vector3.new(0, 4, 0)
+        tagGui.AlwaysOnTop = true
+        tagGui.Parent = root
+
+        local bg = Instance.new("Frame")
+        bg.Size = UDim2.new(1, 0, 1, 0)
+        bg.BackgroundColor3 = Color3.fromRGB(0, 60, 160)
+        bg.BackgroundTransparency = 0.3
+        bg.BorderSizePixel = 0
+        bg.Parent = tagGui
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = bg
+
+        local image = Instance.new("ImageLabel")
+        image.Size = UDim2.new(0, 40, 0, 40)
+        image.Position = UDim2.new(0, 5, 0.5, -20)
+        image.BackgroundTransparency = 1
+        image.Image = "rbxassetid://137671104408806"
+        image.Parent = bg
+
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Size = UDim2.new(1, -55, 0.5, 0)
+        nameLabel.Position = UDim2.new(0, 50, 0, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextStrokeTransparency = 0
+        nameLabel.Text = "Semo Owner"
+        nameLabel.Font = Enum.Font.Fantasy
+        nameLabel.TextScaled = true
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.Parent = bg
+
+        local userLabel = Instance.new("TextLabel")
+        userLabel.Size = UDim2.new(1, -55, 0.5, 0)
+        userLabel.Position = UDim2.new(0, 50, 0.5, 0)
+        userLabel.BackgroundTransparency = 1
+        userLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
+        userLabel.TextStrokeTransparency = 0
+        userLabel.Text = "@" .. player.Name
+        userLabel.Font = Enum.Font.Gotham
+        userLabel.TextScaled = true
+        userLabel.TextXAlignment = Enum.TextXAlignment.Left
+        userLabel.Parent = bg
+    end
+end
+
+local root = Character:FindFirstChild("HumanoidRootPart")
+if root then
+    createTag(root, isOwner)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        task.spawn(function()
+            applyTagToOtherPlayers(player)
+        end)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    task.spawn(function()
+        applyTagToOtherPlayers(player)
+    end)
+end)
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
@@ -39,12 +170,6 @@ local Window = Rayfield:CreateWindow({
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
 })
-
-local Players2 = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer2 = Players2.LocalPlayer
-local Character = LocalPlayer2.Character or LocalPlayer2.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
 
 local MainTab = Window:CreateTab("Main", "star")
 
@@ -67,11 +192,11 @@ local function ClearESP()
 end
 
 local function CreateESP(player)
-    if player == LocalPlayer2 then return end
+    if player == LocalPlayer then return end
     local char = player.Character
     if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
+    local root2 = char:FindFirstChild("HumanoidRootPart")
+    if not root2 then return end
 
     local highlight = Instance.new("Highlight")
     highlight.FillColor = Color3.fromRGB(255, 0, 0)
@@ -84,7 +209,7 @@ local function CreateESP(player)
     bill.Size = UDim2.new(0, 100, 0, 30)
     bill.StudsOffset = Vector3.new(0, 3, 0)
     bill.AlwaysOnTop = true
-    bill.Parent = root
+    bill.Parent = root2
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
@@ -102,7 +227,7 @@ end
 local function RefreshESP()
     ClearESP()
     if not ESPEnabled then return end
-    for _, player in pairs(Players2:GetPlayers()) do
+    for _, player in pairs(Players:GetPlayers()) do
         CreateESP(player)
     end
 end
@@ -117,7 +242,7 @@ MainTab:CreateToggle({
     end,
 })
 
-Players2.PlayerAdded:Connect(function(player)
+Players.PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
         if ESPEnabled then
             task.wait(1)
@@ -126,7 +251,7 @@ Players2.PlayerAdded:Connect(function(player)
     end)
 end)
 
-Players2.PlayerRemoving:Connect(function()
+Players.PlayerRemoving:Connect(function()
     if ESPEnabled then RefreshESP() end
 end)
 
@@ -213,15 +338,15 @@ MainTab:CreateToggle({
         if value then
             task.spawn(function()
                 while TeleportPadsEnabled do
-                    local root = Character:FindFirstChild("HumanoidRootPart")
-                    if root then
-                        local rayOrigin = root.Position
+                    local root2 = Character:FindFirstChild("HumanoidRootPart")
+                    if root2 then
+                        local rayOrigin = root2.Position
                         local rayDirection = Vector3.new(0, -5, 0)
                         local raycastResult = workspace:Raycast(rayOrigin, rayDirection)
                         if raycastResult then
                             for _, v in pairs(workspace:GetDescendants()) do
                                 if v:IsA("BasePart") and v.Name == "CollectionPad" and isGreen(v.Color) then
-                                    v.CFrame = CFrame.new(root.Position + Vector3.new(0, -3, 0))
+                                    v.CFrame = CFrame.new(root2.Position + Vector3.new(0, -3, 0))
                                 end
                             end
                         end
@@ -289,7 +414,7 @@ end)
 
 PlayerTab:CreateDivider()
 
-local tagGui = nil
+local tagGui2 = nil
 
 PlayerTab:CreateToggle({
     Name = "Semo User Tag",
@@ -297,60 +422,14 @@ PlayerTab:CreateToggle({
     Flag = "SemoTagToggle",
     Callback = function(value)
         if value then
-            local root = Character:FindFirstChild("HumanoidRootPart")
-            if root then
-                tagGui = Instance.new("BillboardGui")
-                tagGui.Size = UDim2.new(0, 180, 0, 50)
-                tagGui.StudsOffset = Vector3.new(0, 4, 0)
-                tagGui.AlwaysOnTop = true
-                tagGui.Parent = root
-
-                local bg = Instance.new("Frame")
-                bg.Size = UDim2.new(1, 0, 1, 0)
-                bg.BackgroundColor3 = Color3.fromRGB(60, 0, 100)
-                bg.BackgroundTransparency = 0.3
-                bg.BorderSizePixel = 0
-                bg.Parent = tagGui
-
-                local corner = Instance.new("UICorner")
-                corner.CornerRadius = UDim.new(0, 10)
-                corner.Parent = bg
-
-                local image = Instance.new("ImageLabel")
-                image.Size = UDim2.new(0, 40, 0, 40)
-                image.Position = UDim2.new(0, 5, 0.5, -20)
-                image.BackgroundTransparency = 1
-                image.Image = "rbxassetid://137671104408806"
-                image.Parent = bg
-
-                local nameLabel = Instance.new("TextLabel")
-                nameLabel.Size = UDim2.new(1, -55, 0.5, 0)
-                nameLabel.Position = UDim2.new(0, 50, 0, 0)
-                nameLabel.BackgroundTransparency = 1
-                nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                nameLabel.TextStrokeTransparency = 0
-                nameLabel.Text = "Semo User"
-                nameLabel.Font = Enum.Font.Fantasy
-                nameLabel.TextScaled = true
-                nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-                nameLabel.Parent = bg
-
-                local userLabel = Instance.new("TextLabel")
-                userLabel.Size = UDim2.new(1, -55, 0.5, 0)
-                userLabel.Position = UDim2.new(0, 50, 0.5, 0)
-                userLabel.BackgroundTransparency = 1
-                userLabel.TextColor3 = Color3.fromRGB(200, 180, 255)
-                userLabel.TextStrokeTransparency = 0
-                userLabel.Text = "@Johnrojas1231"
-                userLabel.Font = Enum.Font.Gotham
-                userLabel.TextScaled = true
-                userLabel.TextXAlignment = Enum.TextXAlignment.Left
-                userLabel.Parent = bg
+            local root2 = Character:FindFirstChild("HumanoidRootPart")
+            if root2 then
+                tagGui2 = createTag(root2, isOwner)
             end
         else
-            if tagGui then
-                tagGui:Destroy()
-                tagGui = nil
+            if tagGui2 then
+                tagGui2:Destroy()
+                tagGui2 = nil
             end
         end
     end,
