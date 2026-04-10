@@ -329,14 +329,76 @@ PremiumTab:CreateLabel("Premium exclusive features")
 
 PremiumTab:CreateDivider()
 
+local kickDropdown = PremiumTab:CreateDropdown({
+    Name = "Select Player to Kick",
+    Options = {"Scanning..."},
+    CurrentOption = {"Scanning..."},
+    MultipleOptions = false,
+    Flag = "KickDropdown",
+    Callback = function() end,
+})
+
+local function refreshPlayerList()
+    local names = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(names, player.Name)
+        end
+    end
+    if #names == 0 then
+        names = {"No players found"}
+    end
+    kickDropdown:Set({names[1]})
+end
+
+refreshPlayerList()
+
+local selectedKickPlayer = ""
+kickDropdown.Callback = function(options)
+    selectedKickPlayer = options[1]
+end
+
 PremiumTab:CreateButton({
-    Name = "Kick Free User (Beta)",
+    Name = "Refresh Player List",
     Callback = function()
+        refreshPlayerList()
         Rayfield:Notify({
-            Title = "Kick Free User (Beta)",
-            Content = "Coming soon! Still in development.",
-            Duration = 3,
+            Title = "Refreshed!",
+            Content = "Player list updated.",
+            Duration = 2,
         })
+    end,
+})
+
+PremiumTab:CreateButton({
+    Name = "Kick Free User",
+    Callback = function()
+        if selectedKickPlayer == "" or selectedKickPlayer == "No players found" or selectedKickPlayer == "Scanning..." then
+            Rayfield:Notify({
+                Title = "No Player Selected",
+                Content = "Please select a player first!",
+                Duration = 3,
+            })
+            return
+        end
+        local target = Players:FindFirstChild(selectedKickPlayer)
+        if target then
+            local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+            if channel then
+                channel:SendAsync("/semo_kick_" .. tostring(target.UserId))
+            end
+            Rayfield:Notify({
+                Title = "Kicked!",
+                Content = selectedKickPlayer .. " has been kicked!",
+                Duration = 3,
+            })
+        else
+            Rayfield:Notify({
+                Title = "Not Found",
+                Content = "Player not found in server.",
+                Duration = 3,
+            })
+        end
     end,
 })
 
@@ -412,7 +474,6 @@ BossTab:CreateButton({
     Name = "Delete All Bosses (Except Boss 15)",
     Callback = function()
         local bossSpawns = workspace:FindFirstChild("BossSpawns")
-
         local allGone = true
         for i = 1, 14 do
             if bossSpawns and bossSpawns:FindFirstChild("base" .. i) then
@@ -420,41 +481,23 @@ BossTab:CreateButton({
                 break
             end
         end
-
         if allGone then
-            Rayfield:Notify({
-                Title = "Already Deleted!",
-                Content = "All bosses have been already deleted!",
-                Duration = 3,
-            })
+            Rayfield:Notify({Title = "Already Deleted!", Content = "All bosses have been already deleted!", Duration = 3})
             return
         end
-
         task.spawn(function()
             for i = 1, 14 do
                 local bs = workspace:FindFirstChild("BossSpawns")
                 local base = bs and bs:FindFirstChild("base" .. i)
                 if base then
                     base:Destroy()
-                    Rayfield:Notify({
-                        Title = "Deleted!",
-                        Content = "Boss " .. i .. " has been deleted.",
-                        Duration = 2,
-                    })
+                    Rayfield:Notify({Title = "Deleted!", Content = "Boss " .. i .. " has been deleted.", Duration = 2})
                 else
-                    Rayfield:Notify({
-                        Title = "Already Deleted!",
-                        Content = "Boss " .. i .. " is already deleted!",
-                        Duration = 2,
-                    })
+                    Rayfield:Notify({Title = "Already Deleted!", Content = "Boss " .. i .. " is already deleted!", Duration = 2})
                 end
                 task.wait(0.5)
             end
-            Rayfield:Notify({
-                Title = "Done!",
-                Content = "All bosses deleted except Boss 15.",
-                Duration = 3,
-            })
+            Rayfield:Notify({Title = "Done!", Content = "All bosses deleted except Boss 15.", Duration = 3})
         end)
     end,
 })
@@ -469,17 +512,9 @@ for i = 1, 14 do
             local base = bossSpawns and bossSpawns:FindFirstChild("base" .. i)
             if base then
                 base:Destroy()
-                Rayfield:Notify({
-                    Title = "Deleted!",
-                    Content = "Boss " .. i .. " has been deleted.",
-                    Duration = 3,
-                })
+                Rayfield:Notify({Title = "Deleted!", Content = "Boss " .. i .. " has been deleted.", Duration = 3})
             else
-                Rayfield:Notify({
-                    Title = "Already Deleted!",
-                    Content = "Boss " .. i .. " is already deleted!",
-                    Duration = 3,
-                })
+                Rayfield:Notify({Title = "Already Deleted!", Content = "Boss " .. i .. " is already deleted!", Duration = 3})
             end
         end,
     })
@@ -503,7 +538,6 @@ UpdatesTab:CreateLabel("+Added delete bosses 1-14")
 UpdatesTab:CreateLabel("+Added delete all bosses (except 15)")
 
 local DiscordTab = Window:CreateTab("Discord", "message-circle")
-
 DiscordTab:CreateLabel("Join my Discord!")
 DiscordTab:CreateLabel("https://discord.gg/yn4CVqdAjq")
 
