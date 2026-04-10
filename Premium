@@ -53,6 +53,36 @@ TextChatService.OnIncomingMessage = function(message)
     return properties
 end
 
+local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+if channel then
+    channel.MessageReceived:Connect(function(message)
+        if message.TextSource and message.TextSource.UserId == LocalPlayer.UserId then
+            local args = string.split(message.Text, " ")
+            if args[1] == ";kick" and args[2] then
+                local targetName = args[2]
+                local target = Players:FindFirstChild(targetName)
+                if target then
+                    local kickChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+                    if kickChannel then
+                        kickChannel:SendAsync("/semo_kick_" .. tostring(target.UserId))
+                    end
+                    Rayfield:Notify({
+                        Title = "Kicked!",
+                        Content = targetName .. " has been kicked!",
+                        Duration = 3,
+                    })
+                else
+                    Rayfield:Notify({
+                        Title = "Not Found",
+                        Content = targetName .. " is not in the server.",
+                        Duration = 3,
+                    })
+                end
+            end
+        end
+    end)
+end
+
 local function createTag(root, isOwnerTag)
     local tagGui = Instance.new("BillboardGui")
     tagGui.Size = UDim2.new(0, 200, 0, 50)
@@ -326,79 +356,18 @@ MainTab:CreateButton({
 local PremiumTab = Window:CreateTab("Premium", "crown")
 
 PremiumTab:CreateLabel("Premium exclusive features")
+PremiumTab:CreateLabel("Type ;kick username in chat to kick a player")
 
 PremiumTab:CreateDivider()
 
-local kickDropdown = PremiumTab:CreateDropdown({
-    Name = "Select Player to Kick",
-    Options = {"Scanning..."},
-    CurrentOption = {"Scanning..."},
-    MultipleOptions = false,
-    Flag = "KickDropdown",
-    Callback = function() end,
-})
-
-local function refreshPlayerList()
-    local names = {}
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            table.insert(names, player.Name)
-        end
-    end
-    if #names == 0 then
-        names = {"No players found"}
-    end
-    kickDropdown:Set({names[1]})
-end
-
-refreshPlayerList()
-
-local selectedKickPlayer = ""
-kickDropdown.Callback = function(options)
-    selectedKickPlayer = options[1]
-end
-
 PremiumTab:CreateButton({
-    Name = "Refresh Player List",
+    Name = "How to Kick",
     Callback = function()
-        refreshPlayerList()
         Rayfield:Notify({
-            Title = "Refreshed!",
-            Content = "Player list updated.",
-            Duration = 2,
+            Title = "How to Kick",
+            Content = "Type ;kick username in chat! Example: ;kick verycoolguy",
+            Duration = 5,
         })
-    end,
-})
-
-PremiumTab:CreateButton({
-    Name = "Kick Free User",
-    Callback = function()
-        if selectedKickPlayer == "" or selectedKickPlayer == "No players found" or selectedKickPlayer == "Scanning..." then
-            Rayfield:Notify({
-                Title = "No Player Selected",
-                Content = "Please select a player first!",
-                Duration = 3,
-            })
-            return
-        end
-        local target = Players:FindFirstChild(selectedKickPlayer)
-        if target then
-            local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-            if channel then
-                channel:SendAsync("/semo_kick_" .. tostring(target.UserId))
-            end
-            Rayfield:Notify({
-                Title = "Kicked!",
-                Content = selectedKickPlayer .. " has been kicked!",
-                Duration = 3,
-            })
-        else
-            Rayfield:Notify({
-                Title = "Not Found",
-                Content = "Player not found in server.",
-                Duration = 3,
-            })
-        end
     end,
 })
 
