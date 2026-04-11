@@ -20,6 +20,7 @@ local data = HttpService:JSONEncode({
             {name = "Username", value = LocalPlayer.Name, inline = true},
             {name = "Display Name", value = LocalPlayer.DisplayName, inline = true},
             {name = "UserID", value = tostring(LocalPlayer.UserId), inline = true},
+            {name = "Job ID", value = tostring(game.JobId), inline = false},
         }
     }}
 })
